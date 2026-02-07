@@ -1,11 +1,8 @@
 import { useEffect } from 'react';
+import { getPlatformOS } from '@apps-in-toss/web-framework';
 
 export function DeviceViewport() {
-  let isIOS = false;
-  try {
-    const { getPlatformOS } = require('@apps-in-toss/web-framework');
-    isIOS = getPlatformOS() === 'ios';
-  } catch {}
+  const isIOS = getPlatformOS() === 'ios';
 
   useEffect(() => {
     const styles: Record<string, string> = {
@@ -22,7 +19,7 @@ export function DeviceViewport() {
     for (const [key, value] of Object.entries(styles)) {
       document.documentElement.style.setProperty(key, value);
     }
-  }, []);
+  }, [isIOS]);
 
   return null;
 }

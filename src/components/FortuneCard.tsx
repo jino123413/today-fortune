@@ -21,19 +21,28 @@ const GRADE_MASCOT: Record<string, string> = {
   D: '/mascot/grade-d.png',
 };
 
+const LUCKY_ITEMS = [
+  { key: 'color' as const, label: '행운의 색', icon: '/mascot/lucky-guide-xs.png' },
+  { key: 'number' as const, label: '행운의 숫자', icon: '/mascot/magic-sparkle-xs.png' },
+  { key: 'direction' as const, label: '행운의 방향', icon: '/mascot/mascot-main-xs.png' },
+  { key: 'time' as const, label: '행운의 시간', icon: '/mascot/crystal-ball-xs.png' },
+];
+
 const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
   const gradeInfo = GRADE_CONFIG[result.grade];
 
   return (
     <div className="fortune-main-card">
-      {/* Mascot Grade Badge */}
-      <img
-        src={GRADE_MASCOT[result.grade]}
-        alt={`${result.grade}등급`}
-        className="grade-mascot"
-      />
-      <div className={`grade-letter ${gradeInfo.colorClass}`}>{result.grade}</div>
-      <p className="grade-label">{gradeInfo.label}</p>
+      {/* Grade Section */}
+      <div className="grade-section">
+        <img
+          src={GRADE_MASCOT[result.grade]}
+          alt={`${result.grade}등급`}
+          className="grade-mascot"
+        />
+        <div className={`grade-badge ${gradeInfo.colorClass}`}>{result.grade}</div>
+        <p className="grade-label">{gradeInfo.label}</p>
+      </div>
 
       {/* Title & Description */}
       <h2 className="fortune-title">{result.title}</h2>
@@ -41,19 +50,16 @@ const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
 
       {/* Score Bars */}
       <div className="scores-section">
-        <h3 className="section-title">
-          <img src="/mascot/mascot-main-xs.png" alt="" className="section-mascot" />
-          운세 지수
-        </h3>
+        <h3 className="section-title">운세 지수</h3>
         {result.scores.map((score, index) => (
           <div key={index} className="score-row">
             <span className="score-label">{score.label}</span>
             <div className="score-bar-bg">
               <div
-                className="score-bar-fill"
+                className={`score-bar-fill ${gradeInfo.colorClass}`}
                 style={{
                   width: `${score.value}%`,
-                  animationDelay: `${index * 0.15}s`,
+                  animationDelay: `${index * 0.12}s`,
                 }}
               />
             </div>
@@ -64,38 +70,22 @@ const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
 
       {/* Lucky Items */}
       <div className="lucky-section">
-        <h3 className="section-title">
-          <img src="/mascot/lucky-guide-xs.png" alt="" className="section-mascot" />
-          럭키 아이템
-        </h3>
+        <h3 className="section-title">럭키 아이템</h3>
         <div className="lucky-grid">
-          <div className="lucky-item">
-            <div className="lucky-item-emoji">🎨</div>
-            <div className="lucky-item-label">행운의 색</div>
-            <div className="lucky-item-value">{result.luckyItems.color}</div>
-          </div>
-          <div className="lucky-item">
-            <div className="lucky-item-emoji">🔢</div>
-            <div className="lucky-item-label">행운의 숫자</div>
-            <div className="lucky-item-value">{result.luckyItems.number}</div>
-          </div>
-          <div className="lucky-item">
-            <div className="lucky-item-emoji">🧭</div>
-            <div className="lucky-item-label">행운의 방향</div>
-            <div className="lucky-item-value">{result.luckyItems.direction}</div>
-          </div>
-          <div className="lucky-item">
-            <div className="lucky-item-emoji">⏰</div>
-            <div className="lucky-item-label">행운의 시간</div>
-            <div className="lucky-item-value">{result.luckyItems.time}</div>
-          </div>
+          {LUCKY_ITEMS.map((item) => (
+            <div key={item.key} className="lucky-item">
+              <img src={item.icon} alt="" className="lucky-item-icon" />
+              <div className="lucky-item-label">{item.label}</div>
+              <div className="lucky-item-value">{result.luckyItems[item.key]}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Advice */}
       <div className="advice-section">
         <div className="advice-card">
-          <img src="/mascot/magic-sparkle-xs.png" alt="" className="advice-mascot" />
+          <img src="/mascot/magic-sparkle-xs.png" alt="" className="advice-icon" />
           <p className="advice-text">{result.advice}</p>
         </div>
       </div>

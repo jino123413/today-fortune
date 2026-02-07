@@ -2,11 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { GoogleAdMob, generateHapticFeedback } from '@apps-in-toss/web-framework';
 import { FortuneResult, StreakData } from './types';
 import { getDailyFortune } from './utils/fortune-engine';
-import { getStreakData, updateStreak } from './utils/storage';
+import { updateStreak } from './utils/storage';
 import { DeviceViewport } from './components/DeviceViewport';
 import ResultScreen from './components/ResultScreen';
 
-const AD_GROUP_ID = 'ait-ad-test-interstitial-id';
+const AD_GROUP_ID = 'ait.v2.live.9e5ea8f20f984bc9';
 
 function useInterstitialAd(adGroupId: string = AD_GROUP_ID) {
   const [loading, setLoading] = useState(true);
@@ -101,12 +101,13 @@ function useInterstitialAd(adGroupId: string = AD_GROUP_ID) {
   return { loading, showInterstitialAd };
 }
 
-type AppScreen = 'loading' | 'result';
+type AppScreen = 'home' | 'loading' | 'result';
 
 const App: React.FC = () => {
-  const [screen, setScreen] = useState<AppScreen>('loading');
+  const [screen, setScreen] = useState<AppScreen>('home');
   const [fortuneResult, setFortuneResult] = useState<FortuneResult | null>(null);
   const [premiumUnlocked, setPremiumUnlocked] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
   const [streak, setStreak] = useState<StreakData>({
     currentStreak: 0,
     lastVisitDate: '',
@@ -114,27 +115,33 @@ const App: React.FC = () => {
   });
   const { loading: adLoading, showInterstitialAd } = useInterstitialAd();
 
-  // Initial load: show loading then reveal fortune
+  const todayDate = new Date();
+  const dateStr = `${todayDate.getFullYear()}년 ${todayDate.getMonth() + 1}월 ${todayDate.getDate()}일`;
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  const dayStr = dayNames[todayDate.getDay()];
+
   useEffect(() => {
-    const loadFortune = async () => {
-      // Update streak
+    const loadStreak = async () => {
       const streakData = await updateStreak();
       setStreak(streakData);
-
-      // Get today's fortune
-      const result = getDailyFortune();
-      setFortuneResult(result);
-
-      // Show loading animation briefly
-      setTimeout(() => {
-        try {
-          generateHapticFeedback({ type: 'softMedium' });
-        } catch {}
-        setScreen('result');
-      }, 1500);
     };
+    loadStreak();
+  }, []);
 
-    loadFortune();
+  const handleCheckFortune = useCallback(() => {
+    setScreen('loading');
+    try {
+      generateHapticFeedback({ type: 'softMedium' });
+    } catch {}
+
+    setTimeout(() => {
+      const result = getDailyFortune(0);
+      setFortuneResult(result);
+      try {
+        generateHapticFeedback({ type: 'softMedium' });
+      } catch {}
+      setScreen('result');
+    }, 1800);
   }, []);
 
   const handleUnlockPremium = useCallback(() => {
@@ -154,9 +161,11 @@ const App: React.FC = () => {
         setScreen('loading');
         setPremiumUnlocked(false);
 
-        // Re-generate with slight delay for animation
+        const newCount = refreshCount + 1;
+        setRefreshCount(newCount);
+
         setTimeout(() => {
-          const result = getDailyFortune();
+          const result = getDailyFortune(newCount);
           setFortuneResult(result);
           try {
             generateHapticFeedback({ type: 'softMedium' });
@@ -165,16 +174,42 @@ const App: React.FC = () => {
         }, 1200);
       },
     });
-  }, [showInterstitialAd]);
+  }, [showInterstitialAd, refreshCount]);
 
   return (
     <>
       <DeviceViewport />
       <div className="app">
+        {screen === 'home' && (
+          <div className="home-screen">
+            <div className="home-content">
+              <img src="/mascot/mascot-main.png" alt="마스코트" className="home-mascot" />
+              <h1 className="home-title">오늘 어때</h1>
+              <p className="home-date">{dateStr} ({dayStr})</p>
+              {streak.currentStreak > 0 && (
+                <div className="home-streak">
+                  <img src="/mascot/streak-fire-xs.png" alt="" className="home-streak-icon" />
+                  <span>{streak.currentStreak}일 연속 방문</span>
+                </div>
+              )}
+            </div>
+            <div className="home-bottom">
+              <button className="btn-check-fortune" onClick={handleCheckFortune}>
+                오늘의 운세 확인하기
+              </button>
+              <p className="home-hint">매일 새로운 운세가 기다리고 있어요</p>
+            </div>
+          </div>
+        )}
         {screen === 'loading' && (
           <div className="loading-screen">
             <img src="/mascot/crystal-ball.png" alt="운세 보는 중" className="loading-mascot" />
-            <p className="loading-text">오늘의 운세를 읽고 있어요...</p>
+            <p className="loading-text">운세를 읽고 있어요...</p>
+            <div className="loading-dots">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
           </div>
         )}
         {screen === 'result' && fortuneResult && (

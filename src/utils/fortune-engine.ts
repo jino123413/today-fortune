@@ -16,10 +16,29 @@ function getTodayString(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
-export function getDailyFortune(): FortuneResult {
+function getISOWeekString(): string {
+  const now = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  // ISO week: Monday is the first day of the week
+  // Set to nearest Thursday (current date + 4 - current day number, with Sunday as 7)
+  const dayNum = target.getDay() || 7; // Sunday = 7
+  target.setDate(target.getDate() + 4 - dayNum);
+  const yearStart = new Date(target.getFullYear(), 0, 1);
+  const weekNum = Math.ceil(((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${target.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+}
+
+export function getDailyFortune(refreshCount?: number): FortuneResult {
   const today = getTodayString();
-  const index = hashCode(today + 'daily') % dailyFortunes.length;
+  const count = refreshCount ?? 0;
+  const dailySeed = count > 0 ? today + 'daily' + count : today + 'daily';
+  const index = hashCode(dailySeed) % dailyFortunes.length;
   const fortune = dailyFortunes[index];
+
+  // Weekly fortune uses week-based hash so it stays the same Mon~Sun
+  const weekStr = getISOWeekString();
+  const weeklyIndex = hashCode(weekStr + 'weekly') % dailyFortunes.length;
+  const weeklyFortune = dailyFortunes[weeklyIndex].weeklyFortune;
 
   return {
     grade: fortune.grade,
@@ -39,7 +58,7 @@ export function getDailyFortune(): FortuneResult {
     },
     advice: fortune.advice,
     premiumContent: {
-      weeklyFortune: fortune.weeklyFortune,
+      weeklyFortune,
     },
   };
 }
