@@ -1,14 +1,5 @@
 import React from 'react';
 import { FortuneResult } from '../types';
-import {
-  ScoreChartIcon,
-  SparkleIcon,
-  LuckyColorIcon,
-  LuckyNumberIcon,
-  LuckyDirectionIcon,
-  LuckyTimeIcon,
-  AdviceIcon,
-} from './BrandIcons';
 
 interface FortuneCardProps {
   result: FortuneResult;
@@ -22,15 +13,26 @@ const GRADE_CONFIG: Record<string, { label: string; colorClass: string }> = {
   D: { label: '쉬어가는 하루', colorClass: 'grade-d' },
 };
 
+const GRADE_MASCOT: Record<string, string> = {
+  S: '/mascot/grade-s.png',
+  A: '/mascot/grade-a.png',
+  B: '/mascot/grade-b.png',
+  C: '/mascot/grade-c.png',
+  D: '/mascot/grade-d.png',
+};
+
 const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
   const gradeInfo = GRADE_CONFIG[result.grade];
 
   return (
     <div className="fortune-main-card">
-      {/* Grade Badge */}
-      <div className={`grade-circle ${gradeInfo.colorClass}`}>
-        {result.grade}
-      </div>
+      {/* Mascot Grade Badge */}
+      <img
+        src={GRADE_MASCOT[result.grade]}
+        alt={`${result.grade}등급`}
+        className="grade-mascot"
+      />
+      <div className={`grade-letter ${gradeInfo.colorClass}`}>{result.grade}</div>
       <p className="grade-label">{gradeInfo.label}</p>
 
       {/* Title & Description */}
@@ -40,7 +42,7 @@ const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
       {/* Score Bars */}
       <div className="scores-section">
         <h3 className="section-title">
-          <ScoreChartIcon size={18} />
+          <img src="/mascot/mascot-main-xs.png" alt="" className="section-mascot" />
           운세 지수
         </h3>
         {result.scores.map((score, index) => (
@@ -63,27 +65,27 @@ const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
       {/* Lucky Items */}
       <div className="lucky-section">
         <h3 className="section-title">
-          <SparkleIcon size={18} />
+          <img src="/mascot/lucky-guide-xs.png" alt="" className="section-mascot" />
           럭키 아이템
         </h3>
         <div className="lucky-grid">
           <div className="lucky-item">
-            <LuckyColorIcon size={20} className="lucky-item-icon" />
+            <div className="lucky-item-emoji">🎨</div>
             <div className="lucky-item-label">행운의 색</div>
             <div className="lucky-item-value">{result.luckyItems.color}</div>
           </div>
           <div className="lucky-item">
-            <LuckyNumberIcon size={20} className="lucky-item-icon" />
+            <div className="lucky-item-emoji">🔢</div>
             <div className="lucky-item-label">행운의 숫자</div>
             <div className="lucky-item-value">{result.luckyItems.number}</div>
           </div>
           <div className="lucky-item">
-            <LuckyDirectionIcon size={20} className="lucky-item-icon" />
+            <div className="lucky-item-emoji">🧭</div>
             <div className="lucky-item-label">행운의 방향</div>
             <div className="lucky-item-value">{result.luckyItems.direction}</div>
           </div>
           <div className="lucky-item">
-            <LuckyTimeIcon size={20} className="lucky-item-icon" />
+            <div className="lucky-item-emoji">⏰</div>
             <div className="lucky-item-label">행운의 시간</div>
             <div className="lucky-item-value">{result.luckyItems.time}</div>
           </div>
@@ -93,7 +95,7 @@ const FortuneCard: React.FC<FortuneCardProps> = ({ result }) => {
       {/* Advice */}
       <div className="advice-section">
         <div className="advice-card">
-          <AdviceIcon size={20} className="advice-icon" />
+          <img src="/mascot/magic-sparkle-xs.png" alt="" className="advice-mascot" />
           <p className="advice-text">{result.advice}</p>
         </div>
       </div>

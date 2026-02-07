@@ -173,7 +173,7 @@ const App: React.FC = () => {
       <div className="app">
         {screen === 'loading' && (
           <div className="loading-screen">
-            <div className="loading-orb"></div>
+            <img src="/mascot/crystal-ball.png" alt="운세 보는 중" className="loading-mascot" />
             <p className="loading-text">오늘의 운세를 읽고 있어요...</p>
           </div>
         )}

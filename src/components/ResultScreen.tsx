@@ -1,7 +1,6 @@
 import React from 'react';
 import { FortuneResult, StreakData } from '../types';
 import FortuneCard from './FortuneCard';
-import { StreakFireIcon, PremiumCrownIcon, LockIcon } from './BrandIcons';
 
 interface ResultScreenProps {
   result: FortuneResult;
@@ -37,7 +36,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       {streak.currentStreak > 0 && (
         <div className="streak-container">
           <div className="streak-badge">
-            <StreakFireIcon size={18} />
+            <img src="/mascot/streak-fire-xs.png" alt="" className="streak-mascot" />
             <span>{streak.currentStreak}일 연속 방문</span>
           </div>
           {streak.totalVisits > 1 && (
@@ -56,7 +55,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             {premiumUnlocked ? (
               <div className="premium-unlocked-content">
                 <h3 className="premium-content-title">
-                  <PremiumCrownIcon size={18} />
+                  <img src="/mascot/premium-key-xs.png" alt="" className="section-mascot" />
                   이번 주 운세
                 </h3>
                 <p className="premium-content-text">
@@ -66,7 +65,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             ) : (
               <>
                 <div className="premium-locked-icon">
-                  <LockIcon size={28} />
+                  <img src="/mascot/premium-key-sm.png" alt="" className="premium-mascot" />
                 </div>
                 <p className="premium-locked-title">이번 주 상세 운세</p>
                 <p className="premium-locked-desc">이번 주 전체 운세를 확인해보세요</p>
